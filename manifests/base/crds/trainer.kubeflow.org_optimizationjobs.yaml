@@ -6578,6 +6578,8 @@ spec:
                       rule: has(self.initializer) == has(oldSelf.initializer)
                     - message: trainer is immutable
                       rule: has(self.trainer) == has(oldSelf.trainer)
+                    - message: activeDeadlineSeconds is immutable
+                      rule: has(self.activeDeadlineSeconds) == has(oldSelf.activeDeadlineSeconds)
                 required:
                 - spec
                 type: object

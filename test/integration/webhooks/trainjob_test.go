@@ -1021,6 +1021,29 @@ var _ = ginkgo.Describe("TrainJob marker validations and defaulting", ginkgo.Ord
 					return job
 				},
 				testingutil.BeInvalidError()),
+			ginkgo.Entry("Should fail to add activeDeadlineSeconds after creation",
+				func() *trainer.TrainJob {
+					return testingutil.MakeTrainJobWrapper(ns.Name, "add-deadline").
+						RuntimeRef(trainer.SchemeGroupVersion.WithKind(trainer.TrainingRuntimeKind), "testing").
+						Obj()
+				},
+				func(job *trainer.TrainJob) *trainer.TrainJob {
+					job.Spec.ActiveDeadlineSeconds = 30
+					return job
+				},
+				testingutil.BeInvalidError()),
+			ginkgo.Entry("Should fail to remove activeDeadlineSeconds after creation",
+				func() *trainer.TrainJob {
+					return testingutil.MakeTrainJobWrapper(ns.Name, "remove-deadline").
+						RuntimeRef(trainer.SchemeGroupVersion.WithKind(trainer.TrainingRuntimeKind), "testing").
+						ActiveDeadlineSeconds(30).
+						Obj()
+				},
+				func(job *trainer.TrainJob) *trainer.TrainJob {
+					job.Spec.ActiveDeadlineSeconds = 0
+					return job
+				},
+				testingutil.BeInvalidError()),
 			ginkgo.Entry("Should succeed to update runtimePatches when suspend is true",
 				func() *trainer.TrainJob {
 					return testingutil.MakeTrainJobWrapper(ns.Name, "valid-runtimepatches").
