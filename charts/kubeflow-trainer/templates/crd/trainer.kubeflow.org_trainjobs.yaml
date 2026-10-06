@@ -5602,6 +5602,11 @@ spec:
             required:
             - runtimeRef
             type: object
+            x-kubernetes-validations:
+            - message: initializer is immutable
+              rule: has(self.initializer) == has(oldSelf.initializer)
+            - message: trainer is immutable
+              rule: has(self.trainer) == has(oldSelf.trainer)
           status:
             description: status of TrainJob.
             minProperties: 1

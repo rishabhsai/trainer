@@ -987,6 +987,40 @@ var _ = ginkgo.Describe("TrainJob marker validations and defaulting", ginkgo.Ord
 					return job
 				},
 				testingutil.BeInvalidError()),
+			ginkgo.Entry("Should fail to add trainer after creation",
+				func() *trainer.TrainJob {
+					return testingutil.MakeTrainJobWrapper(ns.Name, "add-trainer").
+						RuntimeRef(trainer.SchemeGroupVersion.WithKind(trainer.TrainingRuntimeKind), "testing").
+						Obj()
+				},
+				func(job *trainer.TrainJob) *trainer.TrainJob {
+					job.Spec.Trainer = &trainer.Trainer{Image: ptr.To("added-later")}
+					return job
+				},
+				testingutil.BeInvalidError()),
+			ginkgo.Entry("Should fail to remove trainer after creation",
+				func() *trainer.TrainJob {
+					return testingutil.MakeTrainJobWrapper(ns.Name, "remove-trainer").
+						RuntimeRef(trainer.SchemeGroupVersion.WithKind(trainer.TrainingRuntimeKind), "testing").
+						Trainer(&trainer.Trainer{Image: ptr.To("test-image")}).
+						Obj()
+				},
+				func(job *trainer.TrainJob) *trainer.TrainJob {
+					job.Spec.Trainer = nil
+					return job
+				},
+				testingutil.BeInvalidError()),
+			ginkgo.Entry("Should fail to add initializer after creation",
+				func() *trainer.TrainJob {
+					return testingutil.MakeTrainJobWrapper(ns.Name, "add-initializer").
+						RuntimeRef(trainer.SchemeGroupVersion.WithKind(trainer.TrainingRuntimeKind), "testing").
+						Obj()
+				},
+				func(job *trainer.TrainJob) *trainer.TrainJob {
+					job.Spec.Initializer = &trainer.Initializer{Model: &trainer.ModelInitializer{StorageUri: ptr.To("hf://added/later")}}
+					return job
+				},
+				testingutil.BeInvalidError()),
 			ginkgo.Entry("Should succeed to update runtimePatches when suspend is true",
 				func() *trainer.TrainJob {
 					return testingutil.MakeTrainJobWrapper(ns.Name, "valid-runtimepatches").
